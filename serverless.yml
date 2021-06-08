@@ -1,0 +1,39 @@
+service: tr-housing
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: us-west-2
+
+# you can add packaging information here
+package:
+#  include:
+#    - include-me.py
+#    - include-me-dir/**
+  exclude:
+    - ml_model_previous_version
+
+
+functions:
+  predict-price-01:
+    handler: handler.predict
+    memorySize: 512
+    timeout: 30
+    events:
+      - http:
+          path: get-price
+          method: get
+          request:
+            parameters:
+              queryStrings:
+                medInc: true
+                houseAge: true
+                aveRooms: true
+                aveBedrms: true
+                population: true
+                aveOccup: true
+                latitude: true
+                longitude: true
+    layers:
+      - arn:aws:lambda:us-west-2:659121023370:layer:sklearn:2
